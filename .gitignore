@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# .NET
+bin/
+obj/
+.vs/
+
+# Rider / IntelliJ
+.idea/
+
+# Node / Angular (future)
+node_modules/
+dist/
+
+# Environment / secrets
+.env
+.env.*
+local.settings.json
+appsettings.Development.json
+secrets.json
