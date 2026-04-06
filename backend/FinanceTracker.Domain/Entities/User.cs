@@ -64,8 +64,7 @@ public class User
     /// </summary>
     public void AddRecurringTransaction(RecurringTransaction recurringTransaction)
     {
-        if (recurringTransaction is null)
-            throw new ArgumentNullException(nameof(recurringTransaction));
+        ArgumentNullException.ThrowIfNull(recurringTransaction);
 
         if (recurringTransaction.UserId != Id)
             throw new InvalidOperationException("Recurring transaction must belong to this user.");
@@ -105,4 +104,83 @@ public class User
         
         _oneOffTransactions.Add(oneOffTransaction);
      }
+
+    public decimal GetBalanceOn(DateOnly targetDate)
+    {
+        if (targetDate < StartDate)
+            throw new InvalidOperationException("Cannot calculate balance before user start date.");
+
+        var balance = InitialBalance;
+
+        balance += CalculateOneOffTransactions(targetDate);
+        balance += CalculateRecurringTransactions(targetDate);
+        
+        return balance;
+    }
+
+    private decimal CalculateOneOffTransactions(DateOnly targetDate)
+    {
+        decimal total = 0;
+
+        foreach (var transaction in _oneOffTransactions)
+        {
+            if (transaction.Date > targetDate) continue;
+            if (transaction.Type == TransactionType.Income)
+            {
+                total += transaction.Amount;
+            }
+            else
+            {
+                total -= transaction.Amount;
+            }
+        }
+        return total;
+    }
+
+    private decimal CalculateRecurringTransactions(DateOnly targetDate)
+    {
+        decimal total = 0;
+
+        foreach (var transaction in _recurringTransactions)
+        {
+            var occurrences = GetRecurringTransactionOccurrencesUpTo(transaction, targetDate);
+
+            if (transaction.Type == TransactionType.Income)
+            {
+                total += transaction.Amount * occurrences;
+            }
+            else
+            {
+                total -= transaction.Amount * occurrences;
+            }
+        }
+
+        return total;
+    }
+
+    private int GetRecurringTransactionOccurrencesUpTo(RecurringTransaction transaction, DateOnly targetDate)
+    {
+        var occurrences = 0;
+
+        var currentMonth = new DateOnly(StartDate.Year, StartDate.Month, 1);
+        var targetMonth = new DateOnly(targetDate.Year, targetDate.Month, 1);
+
+        while (currentMonth <= targetMonth)
+        {
+            var daysInMonth = DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month);
+            var day = Math.Min(transaction.DayOfMonth, daysInMonth);
+
+            var occurrenceDate = new DateOnly(currentMonth.Year, currentMonth.Month, day);
+
+            if (occurrenceDate >= StartDate && occurrenceDate <= targetDate)
+            {
+                occurrences++;
+            }
+
+            currentMonth = currentMonth.AddMonths(1);
+        }
+
+        return occurrences;
+    }
+    
 }
