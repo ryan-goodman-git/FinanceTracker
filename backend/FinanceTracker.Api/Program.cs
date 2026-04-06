@@ -1,7 +1,8 @@
+using FinanceTracker.Domain.Entities;
+using FinanceTracker.Domain.Enums;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -16,29 +17,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+var user = User.Create(Guid.NewGuid(), "Ryan", 1000m, new DateOnly(2025, 1, 1), 2000m, 25);
+Console.WriteLine($"User created{user.Name}");
+Console.WriteLine($"Recurring transactions count {user.RecurringTransactions.Count}");
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+var secondSalary = new RecurringTransaction(
+    Guid.NewGuid(),
+    user.Id,
+    "Second Salary",
+    500m,
+    TransactionType.Income,
+    RecurringTransactionKind.Salary,
+    1);
+
+user.AddRecurringTransaction(secondSalary);
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

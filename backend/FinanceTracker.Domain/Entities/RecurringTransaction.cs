@@ -34,8 +34,8 @@ public class RecurringTransaction
         if (kind == RecurringTransactionKind.Salary && type != TransactionType.Income)
             throw new ArgumentException("Salary must be income.");
 
-        if (kind == RecurringTransactionKind.Bill && type != TransactionType.Expense)
-            throw new ArgumentException("Bill must be an expense.");
+        if (kind == RecurringTransactionKind.Expense && type != TransactionType.Expense)
+            throw new ArgumentException("Expense must be an expense.");
 
         Id = id;
         UserId = userId;
