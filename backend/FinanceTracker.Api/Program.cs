@@ -90,45 +90,86 @@ app.UseHttpsRedirection();
 //
 // Console.WriteLine($"Balance on 28/02/2025: {balance}");
 
-var user = User.Create(
-    Guid.NewGuid(),
-    "Ryan",
-    1000m,
-    new DateOnly(2025, 1, 1),
-    2000m,
-    1); // salary on 1st
+// var user = User.Create(
+//     Guid.NewGuid(),
+//     "Ryan",
+//     1000m,
+//     new DateOnly(2025, 1, 1),
+//     2000m,
+//     1); // salary on 1st
+//
+// // Add recurring expense (rent)
+// var rent = new RecurringTransaction(
+//     Guid.NewGuid(),
+//     user.Id,
+//     "Rent",
+//     500m,
+//     TransactionType.Expense,
+//     RecurringTransactionKind.Expense,
+//     5); // 5th of each month
+//
+// user.AddRecurringTransaction(rent);
+//
+// // Add one-off transactions
+// user.AddOneOffTransaction(new OneOffTransaction(
+//     Guid.NewGuid(),
+//     user.Id,
+//     "Groceries",
+//     100m,
+//     TransactionType.Expense,
+//     new DateOnly(2025, 1, 10)));
+//
+// user.AddOneOffTransaction(new OneOffTransaction(
+//     Guid.NewGuid(),
+//     user.Id,
+//     "Bonus",
+//     300m,
+//     TransactionType.Income,
+//     new DateOnly(2025, 2, 15)));
+//
+// var balance = user.GetBalanceOn(new DateOnly(2025, 2, 20));
+//
+// Console.WriteLine($"Balance on 20/02/2025: {balance}");
 
-// Add recurring expense (rent)
-var rent = new RecurringTransaction(
+var userId = Guid.NewGuid();
+
+var user = User.Create(
+    userId,
+    "Ryan",
+    0m,
+    new DateOnly(2026, 1, 1),
+    1000m,
+    10);
+
+user.AddRecurringTransaction(new RecurringTransaction(
     Guid.NewGuid(),
-    user.Id,
+    userId,
     "Rent",
     500m,
     TransactionType.Expense,
     RecurringTransactionKind.Expense,
-    5); // 5th of each month
+    15));
 
-user.AddRecurringTransaction(rent);
-
-// Add one-off transactions
-user.AddOneOffTransaction(new OneOffTransaction(
+user.AddRecurringTransaction(new RecurringTransaction(
     Guid.NewGuid(),
-    user.Id,
-    "Groceries",
+    userId,
+    "Gym",
     100m,
     TransactionType.Expense,
-    new DateOnly(2025, 1, 10)));
+    RecurringTransactionKind.Expense,
+    16));
 
-user.AddOneOffTransaction(new OneOffTransaction(
-    Guid.NewGuid(),
-    user.Id,
-    "Bonus",
-    300m,
-    TransactionType.Income,
-    new DateOnly(2025, 2, 15)));
+var today = new DateOnly(2026, 1, 12);
 
-var balance = user.GetBalanceOn(new DateOnly(2025, 2, 20));
+var cycleEndDate = user.GetCurrentCycleEndDate(today);
+var projectedSavings = user.GetProjectedSavingsForCurrentCycle(today);
+var balanceOnCycleEnd = user.GetBalanceOn(cycleEndDate);
 
-Console.WriteLine($"Balance on 20/02/2025: {balance}");
+Console.WriteLine($"Today: {today}");
+Console.WriteLine($"Cycle end date: {cycleEndDate}");
+Console.WriteLine($"Projected savings: {projectedSavings}");
+Console.WriteLine($"Balance on cycle end date: {balanceOnCycleEnd}");
+
+app.MapGet("/", () => "Finance Tracker API is running");
 
 //app.Run();

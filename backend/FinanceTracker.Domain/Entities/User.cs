@@ -183,4 +183,55 @@ public class User
         return occurrences;
     }
     
+    public decimal GetProjectedSavingsForCurrentCycle(DateOnly today)
+    {
+        if (today < StartDate)
+            throw new InvalidOperationException("Cannot project balance before user start date.");
+
+        var salaryTransaction = GetSalaryTransaction();
+        var cycleEndDate = CalculateCycleEndDate(today, salaryTransaction.DayOfMonth);
+
+        return GetBalanceOn(cycleEndDate);
+    }
+    
+    private RecurringTransaction GetSalaryTransaction()
+    {
+        var salaryTransaction = _recurringTransactions
+            .SingleOrDefault(t => t.Kind == RecurringTransactionKind.Salary);
+
+        return salaryTransaction ?? throw new InvalidOperationException("User must have a salary transaction.");
+    }
+    
+    private DateOnly CalculateCycleEndDate(DateOnly today, int salaryDayOfMonth)
+    {
+        var salaryDateThisMonth = CreateValidDate(today.Year, today.Month, salaryDayOfMonth);
+
+        if (today < salaryDateThisMonth)
+        {
+            return salaryDateThisMonth.AddDays(-1);
+        }
+
+        var salaryDateNextMonth = salaryDateThisMonth.AddMonths(1);
+
+        return salaryDateNextMonth.AddDays(-1);
+    }
+    
+    public DateOnly GetCurrentCycleEndDate(DateOnly today)
+    {
+        if (today < StartDate)
+            throw new InvalidOperationException("Cannot determine cycle end date before user start date.");
+
+        var salaryTransaction = GetSalaryTransaction();
+
+        return CalculateCycleEndDate(today, salaryTransaction.DayOfMonth);
+    }
+    
+    private DateOnly CreateValidDate(int year, int month, int dayOfMonth)
+    {
+        var daysInMonth = DateTime.DaysInMonth(year, month);
+        var validDay = Math.Min(dayOfMonth, daysInMonth);
+
+        return new DateOnly(year, month, validDay);
+    }
+    
 }
