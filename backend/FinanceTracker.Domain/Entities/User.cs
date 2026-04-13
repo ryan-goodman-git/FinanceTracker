@@ -1,4 +1,3 @@
-using System.Linq;
 using FinanceTracker.Domain.Enums;
 
 namespace FinanceTracker.Domain.Entities;
@@ -51,6 +50,8 @@ public class User
             salaryAmount,
             TransactionType.Income,
             RecurringTransactionKind.Salary,
+            startDate,
+            null,
             salaryDayOfMonth);
 
         user.AddRecurringTransaction(salary);
@@ -74,9 +75,12 @@ public class User
             if (recurringTransaction.Type != TransactionType.Income)
                 throw new InvalidOperationException("Salary transaction must be income.");
 
-            var salaryAlreadyExists = _recurringTransactions.Any(t => t.Kind == RecurringTransactionKind.Salary);
-            if (salaryAlreadyExists)
-                throw new InvalidOperationException("User can only have one salary transaction.");
+            var overlappingSalaryExists = _recurringTransactions.Any(t =>
+                t.Kind == RecurringTransactionKind.Salary &&
+                DatesOverlap(t.StartDate, t.EndDate, recurringTransaction.StartDate, recurringTransaction.EndDate));
+
+            if (overlappingSalaryExists)
+                throw new InvalidOperationException("User cannot have overlapping salary transactions.");
         }
 
         if (recurringTransaction.Kind == RecurringTransactionKind.Expense)
@@ -86,6 +90,14 @@ public class User
         }
 
         _recurringTransactions.Add(recurringTransaction);
+    }
+    
+    private static bool DatesOverlap(DateOnly start1, DateOnly? end1, DateOnly start2, DateOnly? end2)
+    {
+        var effectiveEnd1 = end1 ?? DateOnly.MaxValue;
+        var effectiveEnd2 = end2 ?? DateOnly.MaxValue;
+
+        return start1 <= effectiveEnd2 && start2 <= effectiveEnd1;
     }
     /// <summary>
     /// Adds a one-off transaction while ensuring it belongs to this user
@@ -158,48 +170,70 @@ public class User
         return total;
     }
 
-    private int GetRecurringTransactionOccurrencesUpTo(RecurringTransaction transaction, DateOnly targetDate)
+private int GetRecurringTransactionOccurrencesUpTo(RecurringTransaction transaction, DateOnly targetDate)
+{
+    // Holds the total number of valid occurrences found
+    var occurrences = 0;
+
+    // Start from the first day of the month in which the transaction becomes active
+    var evaluationMonth = new DateOnly(transaction.StartDate.Year, transaction.StartDate.Month, 1);
+
+    // Represents the month we want to stop at (based on the target date)
+    var targetMonth = new DateOnly(targetDate.Year, targetDate.Month, 1);
+
+    // Loop month-by-month until we reach the target month
+    while (evaluationMonth <= targetMonth)
     {
-        var occurrences = 0;
+        // Get how many days exist in this specific month (handles Feb, leap years, etc.)
+        var daysInMonth = DateTime.DaysInMonth(evaluationMonth.Year, evaluationMonth.Month);
 
-        var currentMonth = new DateOnly(StartDate.Year, StartDate.Month, 1);
-        var targetMonth = new DateOnly(targetDate.Year, targetDate.Month, 1);
+        // Ensure the scheduled day is valid for this month
+        // e.g. if scheduled for 31st but month has 30 days → use 30
+        var day = Math.Min(transaction.ScheduledDayOfMonth, daysInMonth);
 
-        while (currentMonth <= targetMonth)
+        // Build the actual date this transaction would occur in this month
+        var occurrenceDate = new DateOnly(evaluationMonth.Year, evaluationMonth.Month, day);
+
+        // Check the transaction has actually started by this occurrence
+        var isOnOrAfterStartDate = occurrenceDate >= transaction.StartDate;
+
+        // Check the transaction has not ended yet (or is still active)
+        var isOnOrBeforeEndDate = !transaction.EndDate.HasValue || occurrenceDate <= transaction.EndDate.Value;
+
+        // Ensure we do not count occurrences beyond the requested target date
+        var isOnOrBeforeTargetDate = occurrenceDate <= targetDate;
+
+        // Only count the occurrence if it passes all validity checks
+        if (isOnOrAfterStartDate && isOnOrBeforeEndDate && isOnOrBeforeTargetDate)
         {
-            var daysInMonth = DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month);
-            var day = Math.Min(transaction.DayOfMonth, daysInMonth);
-
-            var occurrenceDate = new DateOnly(currentMonth.Year, currentMonth.Month, day);
-
-            if (occurrenceDate >= StartDate && occurrenceDate <= targetDate)
-            {
-                occurrences++;
-            }
-
-            currentMonth = currentMonth.AddMonths(1);
+            occurrences++;
         }
-
-        return occurrences;
+        
+        evaluationMonth = evaluationMonth.AddMonths(1);
     }
+    return occurrences;
+}
     
     public decimal GetProjectedSavingsForCurrentCycle(DateOnly today)
     {
         if (today < StartDate)
             throw new InvalidOperationException("Cannot project balance before user start date.");
 
-        var salaryTransaction = GetSalaryTransaction();
-        var cycleEndDate = CalculateCycleEndDate(today, salaryTransaction.DayOfMonth);
+        var salaryTransaction = GetActiveSalaryTransactionOn(today);
+        var cycleEndDate = CalculateCycleEndDate(today, salaryTransaction.ScheduledDayOfMonth);
 
         return GetBalanceOn(cycleEndDate);
     }
     
-    private RecurringTransaction GetSalaryTransaction()
+    private RecurringTransaction GetActiveSalaryTransactionOn(DateOnly date)
     {
-        var salaryTransaction = _recurringTransactions
-            .SingleOrDefault(t => t.Kind == RecurringTransactionKind.Salary);
+        var salaryTransaction = _recurringTransactions.SingleOrDefault(t =>
+            t.Kind == RecurringTransactionKind.Salary &&
+            t.StartDate <= date &&
+            (!t.EndDate.HasValue || t.EndDate.Value >= date));
 
-        return salaryTransaction ?? throw new InvalidOperationException("User must have a salary transaction.");
+        return salaryTransaction 
+               ?? throw new InvalidOperationException("User must have an active salary on this date.");
     }
     
     private DateOnly CalculateCycleEndDate(DateOnly today, int salaryDayOfMonth)
@@ -211,7 +245,8 @@ public class User
             return salaryDateThisMonth.AddDays(-1);
         }
 
-        var salaryDateNextMonth = salaryDateThisMonth.AddMonths(1);
+        var nextMonth = today.AddMonths(1);
+        var salaryDateNextMonth = CreateValidDate(nextMonth.Year, nextMonth.Month, salaryDayOfMonth);
 
         return salaryDateNextMonth.AddDays(-1);
     }
@@ -221,9 +256,9 @@ public class User
         if (today < StartDate)
             throw new InvalidOperationException("Cannot determine cycle end date before user start date.");
 
-        var salaryTransaction = GetSalaryTransaction();
+        var salaryTransaction = GetActiveSalaryTransactionOn(today);
 
-        return CalculateCycleEndDate(today, salaryTransaction.DayOfMonth);
+        return CalculateCycleEndDate(today, salaryTransaction.ScheduledDayOfMonth);
     }
     
     private DateOnly CreateValidDate(int year, int month, int dayOfMonth)

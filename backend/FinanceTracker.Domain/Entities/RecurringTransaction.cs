@@ -10,7 +10,9 @@ public class RecurringTransaction
     public decimal Amount { get; private set; }
     public TransactionType Type { get; private set; }
     public RecurringTransactionKind Kind { get; private set; }
-    public int DayOfMonth { get; private set; }
+    public int ScheduledDayOfMonth { get; private set; }
+    public DateOnly StartDate { get; private set; }
+    public DateOnly? EndDate { get; private set; }
 
     private RecurringTransaction()
     {
@@ -23,13 +25,17 @@ public class RecurringTransaction
         decimal amount,
         TransactionType type,
         RecurringTransactionKind kind,
-        int dayOfMonth)
+        DateOnly startDate,
+        DateOnly? endDate,
+        int scheduledDayOfMonth)
     {
         if (id == Guid.Empty) throw new ArgumentException("Transaction id cannot be empty.", nameof(id));
         if (userId == Guid.Empty) throw new ArgumentException("User id cannot be empty.", nameof(userId));
         if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Description is required.", nameof(description));
         if (amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be greater than zero.");
-        if (dayOfMonth < 1 || dayOfMonth > 31) throw new ArgumentOutOfRangeException(nameof(dayOfMonth), "Day of month must be between 1 and 31.");
+        if (scheduledDayOfMonth is < 1 or > 31) throw new ArgumentOutOfRangeException(nameof(scheduledDayOfMonth), "Day of month must be between 1 and 31.");
+        if (endDate.HasValue && endDate.Value < startDate)
+            throw new ArgumentException("End date cannot be before start date.", nameof(endDate));
 
         if (kind == RecurringTransactionKind.Salary && type != TransactionType.Income)
             throw new ArgumentException("Salary must be income.");
@@ -43,6 +49,8 @@ public class RecurringTransaction
         Amount = amount;
         Type = type;
         Kind = kind;
-        DayOfMonth = dayOfMonth;
+        ScheduledDayOfMonth = scheduledDayOfMonth;
+        StartDate = startDate;
+        EndDate = endDate;
     }
 }
