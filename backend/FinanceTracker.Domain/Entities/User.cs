@@ -106,6 +106,9 @@ public class User
         if (recurringTransaction.Kind == RecurringTransactionKind.Salary)
             throw new InvalidOperationException("Salary transactions cannot be ended directly. Use replacement instead.");
 
+        if(endDate < recurringTransaction.StartDate)
+            throw new InvalidOperationException("End date cannot be before the transaction start date.");
+            
         recurringTransaction.EndOn(endDate);
     }
     
@@ -171,6 +174,26 @@ public class User
         
         _oneOffTransactions.Add(oneOffTransaction);
      }
+
+    public void EditOneOffTransaction(Guid oneOffTransactionId, string description, decimal amount)
+    {
+        var transaction = _oneOffTransactions.SingleOrDefault(t => t.Id == oneOffTransactionId);
+        
+        if (transaction is null)
+            throw new InvalidOperationException("Transaction was not found.");
+        
+        transaction.UpdateDetails(description, amount);
+    }
+
+    public void DeleteOneOffTransaction(Guid oneOffTransactionId)
+    {
+        var transaction = _oneOffTransactions.SingleOrDefault(t => t.Id == oneOffTransactionId);
+        
+        if (transaction is null)
+            throw new InvalidOperationException("Transaction was not found.");
+        
+        _oneOffTransactions.Remove(transaction);
+    }
 
     public decimal GetBalanceOn(DateOnly targetDate)
     {

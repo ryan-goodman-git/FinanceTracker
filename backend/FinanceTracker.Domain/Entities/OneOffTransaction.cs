@@ -35,4 +35,14 @@ public class OneOffTransaction
         Type = type;
         Date = date;
     }
+
+    public void UpdateDetails(string description, decimal amount)
+    {
+        if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Description is required.", nameof(description));
+        
+        if (amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be greater than zero.");
+        
+        Description = description.Trim();
+        Amount = amount;
+    }
 }
