@@ -53,4 +53,15 @@ public class RecurringTransaction
         StartDate = startDate;
         EndDate = endDate;
     }
+    
+    public void EndOn(DateOnly endDate)
+    {
+        if (EndDate.HasValue)
+            throw new InvalidOperationException("Recurring transaction has already ended.");
+
+        if (endDate < StartDate)
+            throw new InvalidOperationException("Recurring transaction cannot end before it starts.");
+
+        EndDate = endDate;
+    }
 }

@@ -60,8 +60,8 @@ public class User
     }
     
     /// <summary>
-    /// Adds a recurring transaction while enforcing aggregate rules
-    /// (correct user, single salary, valid type/kind combination).
+    /// (correct user, valid start date, valid type/kind combination,
+    /// and no overlapping salary date ranges).
     /// </summary>
     public void AddRecurringTransaction(RecurringTransaction recurringTransaction)
     {
@@ -69,6 +69,9 @@ public class User
 
         if (recurringTransaction.UserId != Id)
             throw new InvalidOperationException("Recurring transaction must belong to this user.");
+
+        if (recurringTransaction.StartDate < StartDate)
+            throw new InvalidOperationException("Recurring transaction cannot start before user start date.");
 
         if (recurringTransaction.Kind == RecurringTransactionKind.Salary)
         {
@@ -92,6 +95,57 @@ public class User
         _recurringTransactions.Add(recurringTransaction);
     }
     
+    public void EndRecurringTransaction(Guid recurringTransactionId, DateOnly endDate)
+    {
+        var recurringTransaction = _recurringTransactions.SingleOrDefault(t => t.Id == recurringTransactionId);
+
+        if (recurringTransaction is null)
+            throw new InvalidOperationException("Recurring transaction was not found.");
+        
+        // only let a salary change through ReplaceRecurringTransaction
+        if (recurringTransaction.Kind == RecurringTransactionKind.Salary)
+            throw new InvalidOperationException("Salary transactions cannot be ended directly. Use replacement instead.");
+
+        recurringTransaction.EndOn(endDate);
+    }
+    
+    public void ReplaceRecurringTransaction(
+        Guid recurringTransactionId,
+        string description,
+        decimal amount,
+        int scheduledDayOfMonth,
+        DateOnly replacementStartDate)
+    {
+        var existing = _recurringTransactions.SingleOrDefault(t => t.Id == recurringTransactionId);
+
+        if (existing is null)
+            throw new InvalidOperationException("Recurring transaction was not found.");
+        
+        if (replacementStartDate <= existing.StartDate)
+            throw new InvalidOperationException("Replacement start date must be after the existing transaction start date.");
+        
+        if (existing.EndDate.HasValue && replacementStartDate > existing.EndDate.Value)
+            throw new InvalidOperationException("Cannot replace a transaction after it has already ended.");
+
+        // Step 1: end old version the day before the replacement start date
+        existing.EndOn(replacementStartDate.AddDays(-1));
+
+        // Step 2: create new version starting on the replacement start date
+        var replacement = new RecurringTransaction(
+            Guid.NewGuid(),
+            Id,
+            description,
+            amount,
+            existing.Type,
+            existing.Kind,
+            replacementStartDate,
+            null,
+            scheduledDayOfMonth);
+
+        // Step 3: add through aggregate rules
+        AddRecurringTransaction(replacement);
+    }
+    
     private static bool DatesOverlap(DateOnly start1, DateOnly? end1, DateOnly start2, DateOnly? end2)
     {
         var effectiveEnd1 = end1 ?? DateOnly.MaxValue;
@@ -99,6 +153,7 @@ public class User
 
         return start1 <= effectiveEnd2 && start2 <= effectiveEnd1;
     }
+    
     /// <summary>
     /// Adds a one-off transaction while ensuring it belongs to this user
     /// and does not occur before the user's start date.
@@ -170,49 +225,49 @@ public class User
         return total;
     }
 
-private int GetRecurringTransactionOccurrencesUpTo(RecurringTransaction transaction, DateOnly targetDate)
-{
-    // Holds the total number of valid occurrences found
-    var occurrences = 0;
-
-    // Start from the first day of the month in which the transaction becomes active
-    var evaluationMonth = new DateOnly(transaction.StartDate.Year, transaction.StartDate.Month, 1);
-
-    // Represents the month we want to stop at (based on the target date)
-    var targetMonth = new DateOnly(targetDate.Year, targetDate.Month, 1);
-
-    // Loop month-by-month until we reach the target month
-    while (evaluationMonth <= targetMonth)
+    private int GetRecurringTransactionOccurrencesUpTo(RecurringTransaction transaction, DateOnly targetDate)
     {
-        // Get how many days exist in this specific month (handles Feb, leap years, etc.)
-        var daysInMonth = DateTime.DaysInMonth(evaluationMonth.Year, evaluationMonth.Month);
-
-        // Ensure the scheduled day is valid for this month
-        // e.g. if scheduled for 31st but month has 30 days → use 30
-        var day = Math.Min(transaction.ScheduledDayOfMonth, daysInMonth);
-
-        // Build the actual date this transaction would occur in this month
-        var occurrenceDate = new DateOnly(evaluationMonth.Year, evaluationMonth.Month, day);
-
-        // Check the transaction has actually started by this occurrence
-        var isOnOrAfterStartDate = occurrenceDate >= transaction.StartDate;
-
-        // Check the transaction has not ended yet (or is still active)
-        var isOnOrBeforeEndDate = !transaction.EndDate.HasValue || occurrenceDate <= transaction.EndDate.Value;
-
-        // Ensure we do not count occurrences beyond the requested target date
-        var isOnOrBeforeTargetDate = occurrenceDate <= targetDate;
-
-        // Only count the occurrence if it passes all validity checks
-        if (isOnOrAfterStartDate && isOnOrBeforeEndDate && isOnOrBeforeTargetDate)
+        // Holds the total number of valid occurrences found
+        var occurrences = 0;
+    
+        // Start from the first day of the month in which the transaction becomes active
+        var evaluationMonth = new DateOnly(transaction.StartDate.Year, transaction.StartDate.Month, 1);
+    
+        // Represents the month we want to stop at (based on the target date)
+        var targetMonth = new DateOnly(targetDate.Year, targetDate.Month, 1);
+    
+        // Loop month-by-month until we reach the target month
+        while (evaluationMonth <= targetMonth)
         {
-            occurrences++;
+            // Get how many days exist in this specific month (handles Feb, leap years, etc.)
+            var daysInMonth = DateTime.DaysInMonth(evaluationMonth.Year, evaluationMonth.Month);
+    
+            // Ensure the scheduled day is valid for this month
+            // e.g. if scheduled for 31st but month has 30 days → use 30
+            var day = Math.Min(transaction.ScheduledDayOfMonth, daysInMonth);
+    
+            // Build the actual date this transaction would occur in this month
+            var occurrenceDate = new DateOnly(evaluationMonth.Year, evaluationMonth.Month, day);
+    
+            // Check the transaction has actually started by this occurrence
+            var isOnOrAfterStartDate = occurrenceDate >= transaction.StartDate;
+    
+            // Check the transaction has not ended yet (or is still active)
+            var isOnOrBeforeEndDate = !transaction.EndDate.HasValue || occurrenceDate <= transaction.EndDate.Value;
+    
+            // Ensure we do not count occurrences beyond the requested target date
+            var isOnOrBeforeTargetDate = occurrenceDate <= targetDate;
+    
+            // Only count the occurrence if it passes all validity checks
+            if (isOnOrAfterStartDate && isOnOrBeforeEndDate && isOnOrBeforeTargetDate)
+            {
+                occurrences++;
+            }
+            
+            evaluationMonth = evaluationMonth.AddMonths(1);
         }
-        
-        evaluationMonth = evaluationMonth.AddMonths(1);
+        return occurrences;
     }
-    return occurrences;
-}
     
     public decimal GetProjectedSavingsForCurrentCycle(DateOnly today)
     {
