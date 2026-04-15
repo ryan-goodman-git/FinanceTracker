@@ -71,33 +71,7 @@ public class User
     /// </summary>
     public void AddRecurringTransaction(RecurringTransaction recurringTransaction)
     {
-        ArgumentNullException.ThrowIfNull(recurringTransaction);
-
-        if (recurringTransaction.UserId != Id)
-            throw new InvalidOperationException("Recurring transaction must belong to this user.");
-
-        if (recurringTransaction.StartDate < StartDate)
-            throw new InvalidOperationException("Recurring transaction cannot start before user start date.");
-
-        if (recurringTransaction.Kind == RecurringTransactionKind.Salary)
-        {
-            if (recurringTransaction.Type != TransactionType.Income)
-                throw new InvalidOperationException("Salary transaction must be income.");
-
-            var overlappingSalaryExists = _recurringTransactions.Any(t =>
-                t.Kind == RecurringTransactionKind.Salary &&
-                DatesOverlap(t.StartDate, t.EndDate, recurringTransaction.StartDate, recurringTransaction.EndDate));
-
-            if (overlappingSalaryExists)
-                throw new InvalidOperationException("User cannot have overlapping salary transactions.");
-        }
-
-        if (recurringTransaction.Kind == RecurringTransactionKind.Expense)
-        {
-            if (recurringTransaction.Type != TransactionType.Expense)
-                throw new InvalidOperationException("Expense recurring transaction must be expense.");
-        }
-
+        ValidateRecurringTransactionCanBeAdded(recurringTransaction);
         _recurringTransactions.Add(recurringTransaction);
     }
 
@@ -142,11 +116,9 @@ public class User
             throw new InvalidOperationException(
                 "Replacement start date must be after the existing transaction start date.");
 
-        if (existing.EndDate.HasValue && replacementStartDate > existing.EndDate.Value)
-            throw new InvalidOperationException("Cannot replace a transaction after it has already ended.");
-
-        existing.EndOn(replacementStartDate.AddDays(-1));
-
+        if (existing.EndDate.HasValue)
+            throw new InvalidOperationException("Cannot replace a transaction that has already ended.");
+        
         var replacement = new RecurringTransaction(
             Guid.NewGuid(),
             Id,
@@ -157,8 +129,50 @@ public class User
             replacementStartDate,
             null,
             scheduledDayOfMonth);
+        
+        ValidateRecurringTransactionCanBeAdded(replacement, existing.Id);
+        
+        existing.EndOn(replacementStartDate.AddDays(-1));
+        _recurringTransactions.Add(replacement);
+    }
+    
+    /// <summary>
+    /// Validates whether a recurring transaction can be added to this user
+    /// without mutating aggregate state.
+    /// Optionally ignores one existing transaction during overlap checks,
+    /// which is useful during replacement.
+    /// </summary>
+    private void ValidateRecurringTransactionCanBeAdded(
+        RecurringTransaction recurringTransaction,
+        Guid? recurringTransactionIdToIgnore = null)
+    {
+        ArgumentNullException.ThrowIfNull(recurringTransaction);
 
-        AddRecurringTransaction(replacement);
+        if (recurringTransaction.UserId != Id)
+            throw new InvalidOperationException("Recurring transaction must belong to this user.");
+
+        if (recurringTransaction.StartDate < StartDate)
+            throw new InvalidOperationException("Recurring transaction cannot start before user start date.");
+
+        if (recurringTransaction.Kind == RecurringTransactionKind.Salary)
+        {
+            if (recurringTransaction.Type != TransactionType.Income)
+                throw new InvalidOperationException("Salary transaction must be income.");
+
+            var overlappingSalaryExists = _recurringTransactions.Any(t =>
+                t.Id != recurringTransactionIdToIgnore &&
+                t.Kind == RecurringTransactionKind.Salary &&
+                DatesOverlap(t.StartDate, t.EndDate, recurringTransaction.StartDate, recurringTransaction.EndDate));
+
+            if (overlappingSalaryExists)
+                throw new InvalidOperationException("User cannot have overlapping salary transactions.");
+        }
+
+        if (recurringTransaction.Kind == RecurringTransactionKind.Expense &&
+            recurringTransaction.Type != TransactionType.Expense)
+        {
+            throw new InvalidOperationException("Expense recurring transaction must be expense.");
+        }
     }
 
     /// <summary>
