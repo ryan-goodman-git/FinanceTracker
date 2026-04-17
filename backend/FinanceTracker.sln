@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceTracker.Domain", "Fi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceTracker.Infrastructure", "FinanceTracker.Infrastructure\FinanceTracker.Infrastructure.csproj", "{F460B1B0-9999-403B-A428-85D0D643D0BD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6FEAA019-D13D-4EE8-B54A-E2C21A2DE324}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceTracker.Domain.Tests", "tests\FinanceTracker.Domain.Tests\FinanceTracker.Domain.Tests.csproj", "{8E804726-F54D-453D-9A35-3B7DEBB0CA22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,12 @@ Global
 		{F460B1B0-9999-403B-A428-85D0D643D0BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F460B1B0-9999-403B-A428-85D0D643D0BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F460B1B0-9999-403B-A428-85D0D643D0BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E804726-F54D-453D-9A35-3B7DEBB0CA22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E804726-F54D-453D-9A35-3B7DEBB0CA22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E804726-F54D-453D-9A35-3B7DEBB0CA22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E804726-F54D-453D-9A35-3B7DEBB0CA22}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8E804726-F54D-453D-9A35-3B7DEBB0CA22} = {6FEAA019-D13D-4EE8-B54A-E2C21A2DE324}
 	EndGlobalSection
 EndGlobal

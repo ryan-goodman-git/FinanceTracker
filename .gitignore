@@ -8,6 +8,7 @@ obj/
 
 # Rider / IntelliJ
 .idea/
+*.DotSettings.user
 
 # Node / Angular (future)
 node_modules/
