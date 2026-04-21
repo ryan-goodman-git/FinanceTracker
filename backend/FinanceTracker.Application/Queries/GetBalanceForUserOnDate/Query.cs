@@ -1,6 +1,3 @@
 namespace FinanceTracker.Application.Queries.GetBalanceForUserOnDate;
 
-public class Query
-{
-    
-}
+public sealed record Query(Guid UserId, DateOnly TargetDate);

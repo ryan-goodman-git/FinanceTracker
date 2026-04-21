@@ -1,8 +1,8 @@
-namespace FinanceTracker.Application.Tests.Queries.GetProjectedSavingsForUser;
-
 using FinanceTracker.Application.Queries.GetProjectedSavingsForUser;
 using FinanceTracker.Application.Tests.Fakes;
 using FinanceTracker.Domain.Entities;
+
+namespace FinanceTracker.Application.Tests.Queries.GetProjectedSavingsForUser;
 
 public class HandlerTests
 {

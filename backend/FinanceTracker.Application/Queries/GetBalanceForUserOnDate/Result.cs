@@ -1,6 +1,3 @@
 namespace FinanceTracker.Application.Queries.GetBalanceForUserOnDate;
 
-public class Result
-{
-    
-}
+public sealed record Result(decimal Balance);
