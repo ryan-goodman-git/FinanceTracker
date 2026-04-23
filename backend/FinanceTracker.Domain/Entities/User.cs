@@ -99,7 +99,7 @@ public class User
     /// the day before the supplied replacement start date and creating a new version.
     /// This preserves financial history instead of overwriting the original record.
     /// </summary>
-    public void ReplaceRecurringTransaction(
+    public RecurringTransaction ReplaceRecurringTransaction(
         Guid recurringTransactionId,
         string description,
         decimal amount,
@@ -133,6 +133,8 @@ public class User
         
         existing.EndOn(replacementStartDate.AddDays(-1));
         _recurringTransactions.Add(replacement);
+        
+        return replacement;
     }
     
     /// <summary>

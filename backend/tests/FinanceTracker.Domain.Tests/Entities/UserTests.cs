@@ -1061,4 +1061,38 @@ public class UserTests
         // Assert
         Assert.Equal(7900m, projectedSavings);
     }
+    
+    [Fact]
+    public void ReplaceRecurringTransaction_ShouldReturnReplacementTransaction()
+    {
+        // Arrange
+        var user = CreateValidUser();
+
+        var originalRecurringTransaction = CreateValidRecurringExpense(user.Id);
+        user.AddRecurringTransaction(originalRecurringTransaction);
+
+        // Act
+        var replacement = user.ReplaceRecurringTransaction(
+            originalRecurringTransaction.Id,
+            "Gym Membership",
+            60m,
+            16,
+            new DateOnly(2026, 2, 1));
+
+        // Assert
+        Assert.NotNull(replacement);
+        Assert.NotEqual(Guid.Empty, replacement.Id);
+        Assert.NotEqual(originalRecurringTransaction.Id, replacement.Id);
+
+        Assert.Equal(user.Id, replacement.UserId);
+        Assert.Equal("Gym Membership", replacement.Description);
+        Assert.Equal(60m, replacement.Amount);
+        Assert.Equal(TransactionType.Expense, replacement.Type);
+        Assert.Equal(RecurringTransactionKind.Expense, replacement.Kind);
+        Assert.Equal(new DateOnly(2026, 2, 1), replacement.StartDate);
+        Assert.Null(replacement.EndDate);
+        Assert.Equal(16, replacement.ScheduledDayOfMonth);
+
+        Assert.Contains(user.RecurringTransactions, t => t.Id == replacement.Id);
+    }
 }
