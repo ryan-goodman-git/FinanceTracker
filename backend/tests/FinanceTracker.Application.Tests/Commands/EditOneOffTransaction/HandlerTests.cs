@@ -54,4 +54,21 @@ public class HandlerTests
         Assert.Equal("Updated Food", updatedTransaction.Description);
         Assert.Equal(200m, updatedTransaction.Amount);
     }
+    
+    [Fact]
+    public void Handle_ShouldThrowException_WhenUserDoesNotExist()
+    {
+        // Arrange
+        var repository = new FakeUserRepository();
+        var handler = new Handler(repository);
+        var command = new Command(Guid.NewGuid(), Guid.NewGuid(), "Updated Food", 200m);
+        
+        // Act
+        var exception = Assert.Throws<InvalidOperationException>(() => handler.Handle(command));
+        
+        // Assert
+        Assert.NotNull(exception);
+        Assert.Equal("User was not found.", exception.Message);
+        
+    }
 }

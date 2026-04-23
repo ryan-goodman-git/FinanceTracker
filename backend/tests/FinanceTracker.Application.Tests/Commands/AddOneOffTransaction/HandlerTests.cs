@@ -50,4 +50,27 @@ public class HandlerTests
         Assert.Equal(TransactionType.Expense, transaction.Type);
         Assert.Equal(new DateOnly(2026, 1, 10), transaction.Date);
     }
+    
+    [Fact]
+    public void Handle_ShouldThrowException_WhenUserDoesNotExists()
+    {
+        // Arrange
+        var repository = new FakeUserRepository();
+        
+        var handler = new Handler(repository);
+
+        var command = new Command(
+            Guid.NewGuid(),
+            "Food",
+            100m,
+            TransactionType.Expense,
+            new DateOnly(2026, 1, 10));
+        
+        // Act
+        var exception = Assert.Throws<InvalidOperationException>(() => handler.Handle(command));
+        
+        // Assert
+        Assert.NotNull(exception);
+        Assert.Equal("User was not found.", exception.Message);
+    }
 }

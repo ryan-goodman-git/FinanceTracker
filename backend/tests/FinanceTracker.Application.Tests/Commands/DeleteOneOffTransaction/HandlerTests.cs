@@ -48,4 +48,21 @@ public class HandlerTests
         Assert.Empty(user.OneOffTransactions);
         Assert.DoesNotContain(user.OneOffTransactions, t => t.Id == oneOffTransaction.Id);
     }
+    
+    [Fact]
+    public void Handle_ShouldThrowException_WhenUserDoesNotExist()
+    {
+        // Arrange
+        var repository = new FakeUserRepository();
+        var handler = new Handler(repository);
+        var command = new Command(Guid.NewGuid(), Guid.NewGuid());
+        
+        // Act
+        var exception = Assert.Throws<InvalidOperationException>(() => handler.Handle(command));
+        
+        //Assert
+        Assert.NotNull(exception);
+        Assert.Equal("User was not found.", exception.Message);
+        
+    }
 }

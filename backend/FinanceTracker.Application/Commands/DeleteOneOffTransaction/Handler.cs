@@ -16,7 +16,7 @@ public class Handler
         var user = _repository.GetById(command.UserId);
         
         if(user is null)
-            throw new InvalidOperationException("User was not found");
+            throw new InvalidOperationException("User was not found.");
         
         user.DeleteOneOffTransaction(command.OneOffTransactionId);
         
