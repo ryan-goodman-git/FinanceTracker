@@ -25,4 +25,10 @@
     <ProjectReference Include="..\FinanceTracker.Infrastructure\FinanceTracker.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Contracts\Responses\" />
+    <Folder Include="Endpoints\OneOffTransactions\" />
+    <Folder Include="Endpoints\RecurringTransactions\" />
+  </ItemGroup>
+
 </Project>

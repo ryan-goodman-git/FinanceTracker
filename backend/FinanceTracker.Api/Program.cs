@@ -1,8 +1,6 @@
 using FinanceTracker.Application;
 using FinanceTracker.Infrastructure;
-using FinanceTracker.Application.Interfaces;
-using FinanceTracker.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using FinanceTracker.Api.Endpoints.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,5 +19,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapUserEndpoints();
 
 app.Run();
