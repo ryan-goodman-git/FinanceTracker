@@ -12,6 +12,9 @@ public class RecurringTransactionConfiguration : IEntityTypeConfiguration<Recurr
 
         builder.HasKey(x => x.Id);
         
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
+        
         builder.Property(x => x.Description)
             .IsRequired();
 

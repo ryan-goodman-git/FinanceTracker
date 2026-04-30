@@ -29,7 +29,11 @@ public class EfUserRepository : IUserRepository
 
     public void Update(User user)
     {
-        _dbContext.Users.Update(user);
+        foreach (var entry in _dbContext.ChangeTracker.Entries())
+        {
+            Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
+        }
+
         _dbContext.SaveChanges();
     }
 }

@@ -1,6 +1,8 @@
 using FinanceTracker.Application;
 using FinanceTracker.Infrastructure;
 using FinanceTracker.Api.Endpoints.Users;
+using FinanceTracker.Api.Endpoints.OneOffTransactions;
+using FinanceTracker.Api.Endpoints.RecurringTransactions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,5 +23,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapUserEndpoints();
+app.MapOneOffTransactionEndpoints();
+app.MapRecurringTransactionEndpoints();
 
 app.Run();

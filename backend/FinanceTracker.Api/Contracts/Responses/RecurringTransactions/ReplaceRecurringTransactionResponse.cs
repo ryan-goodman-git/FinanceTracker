@@ -1,0 +1,3 @@
+namespace FinanceTracker.Api.Contracts.Responses.RecurringTransactions;
+
+public sealed record  ReplaceRecurringTransactionResponse(Guid RecurringTransactionId);

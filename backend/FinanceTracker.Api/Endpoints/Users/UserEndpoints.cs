@@ -1,4 +1,6 @@
 using FinanceTracker.Api.Contracts.Requests.Users;
+using FinanceTracker.Api.Contracts.Responses.Users;
+using FinanceTracker.Api.Errors;
 using CreateUser = FinanceTracker.Application.Commands.CreateUser;
 using GetBalanceForUserOnDate = FinanceTracker.Application.Queries.GetBalanceForUserOnDate;
 using GetProjectedSavingsForUser = FinanceTracker.Application.Queries.GetProjectedSavingsForUser;
@@ -11,16 +13,29 @@ public static class UserEndpoints
     {
         app.MapPost("/users", (CreateUserRequest request, CreateUser.Handler handler) =>
         {
-            var command = new CreateUser.Command(
-                request.Name,
-                request.InitialBalance,
-                request.StartDate,
-                request.SalaryAmount,
-                request.SalaryDayOfMonth);
+            try
+            {
+                var command = new CreateUser.Command(
+                    request.Name,
+                    request.InitialBalance,
+                    request.StartDate,
+                    request.SalaryAmount,
+                    request.SalaryDayOfMonth);
 
-            var result = handler.Handle(command);
+                var result = handler.Handle(command);
 
-            return Results.Ok(result);
+                var response = new CreateUserResponse(result.UserId);
+
+                return Results.Created($"/users/{response.UserId}", response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.BadRequest(new ApiError(ex.Message));
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(new ApiError(ex.Message));
+            }
         });
 
         app.MapGet("/users/{userId:guid}/balance", (
@@ -28,10 +43,26 @@ public static class UserEndpoints
             DateOnly targetDate,
             GetBalanceForUserOnDate.Handler handler) =>
         {
-            var query = new GetBalanceForUserOnDate.Query(userId, targetDate);
-            var result = handler.Handle(query);
+            try
+            {
+                var query = new GetBalanceForUserOnDate.Query(userId, targetDate);
+                var result = handler.Handle(query);
 
-            return Results.Ok(result);
+                var response = new GetBalanceResponse(
+                    userId,
+                    targetDate,
+                    result.Balance);
+
+                return Results.Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.NotFound(new ApiError(ex.Message));
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(new ApiError(ex.Message));
+            }
         });
         
         app.MapGet("/users/{userId:guid}/projected-savings", (
@@ -39,12 +70,29 @@ public static class UserEndpoints
             DateOnly today,
             GetProjectedSavingsForUser.Handler handler) =>
         {
-            var query = new GetProjectedSavingsForUser.Query(userId, today);
-            var result = handler.Handle(query);
+            try
+            {
+                var query = new GetProjectedSavingsForUser.Query(userId, today);
+                var result = handler.Handle(query);
 
-            return Results.Ok(result);
+                var response = new GetProjectedSavingsResponse(
+                    userId,
+                    today,
+                    result.CycleEndDate,
+                    result.ProjectedSavings);
+
+                return Results.Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.NotFound(new ApiError(ex.Message));
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(new ApiError(ex.Message));
+            }
         });
-
+        
         return app;
     }
 }

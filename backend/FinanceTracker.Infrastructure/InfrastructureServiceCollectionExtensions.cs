@@ -13,7 +13,11 @@ public static class InfrastructureServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddDbContext<FinanceTrackerDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure();
+                }));
 
         services.AddScoped<IUserRepository, EfUserRepository>();
 
