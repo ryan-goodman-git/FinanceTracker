@@ -5,6 +5,7 @@ using FinanceTracker.Api.Errors;
 using AddOneOffTransaction = FinanceTracker.Application.Commands.AddOneOffTransaction;
 using EditOneOffTransaction = FinanceTracker.Application.Commands.EditOneOffTransaction;
 using DeleteOneOffTransaction = FinanceTracker.Application.Commands.DeleteOneOffTransaction;
+using GetOneOffTransactionById = FinanceTracker.Application.Queries.GetOneOffTransactionById;
 
 namespace FinanceTracker.Api.Endpoints.OneOffTransactions;
 
@@ -41,6 +42,32 @@ public static class OneOffTransactionEndpoints
             catch(ArgumentException ex)
             {
                 return Results.BadRequest(new ApiError(ex.Message));
+            }
+        });
+        
+        app.MapGet("/users/{userId:guid}/one-off-transactions/{transactionId:guid}", (
+            Guid userId,
+            Guid transactionId,
+            GetOneOffTransactionById.Handler handler) =>
+        {
+            try
+            {
+                var query = new GetOneOffTransactionById.Query(userId, transactionId);
+                var result = handler.Handle(query);
+
+                var response = new GetOneOffTransactionResponse(
+                    result.OneOffTransactionId,
+                    result.UserId,
+                    result.Description,
+                    result.Amount,
+                    result.Type,
+                    result.Date);
+
+                return Results.Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.NotFound(new ApiError(ex.Message));
             }
         });
 

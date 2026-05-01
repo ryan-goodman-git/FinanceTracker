@@ -5,6 +5,7 @@ using FinanceTracker.Api.Errors;
 using AddRecurringTransaction = FinanceTracker.Application.Commands.AddRecurringTransaction;
 using ReplaceRecurringTransaction = FinanceTracker.Application.Commands.ReplaceRecurringTransaction;
 using EndRecurringTransaction = FinanceTracker.Application.Commands.EndRecurringTransaction;
+using GetRecurringTransactionById = FinanceTracker.Application.Queries.GetRecurringTransactionById;
 
 namespace FinanceTracker.Api.Endpoints.RecurringTransactions;
 
@@ -41,6 +42,35 @@ public static class RecurringTransactionEndpoints
             catch (ArgumentException ex)
             {
                 return Results.BadRequest(new ApiError(ex.Message));
+            }
+        });
+        
+        app.MapGet("/users/{userId:guid}/recurring-transactions/{recurringTransactionId:guid}", (
+            Guid userId,
+            Guid recurringTransactionId,
+            GetRecurringTransactionById.Handler handler) =>
+        {
+            try
+            {
+                var query = new GetRecurringTransactionById.Query(userId, recurringTransactionId);
+                var result = handler.Handle(query);
+
+                var response = new GetRecurringTransactionResponse(
+                    result.RecurringTransactionId,
+                    result.UserId,
+                    result.Description,
+                    result.Amount,
+                    result.Type,
+                    result.Kind,
+                    result.ScheduledDayOfMonth,
+                    result.StartDate,
+                    result.EndDate);
+
+                return Results.Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.NotFound(new ApiError(ex.Message));
             }
         });
 
