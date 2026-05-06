@@ -62,6 +62,26 @@
   - `PUT /users/{userId}/recurring-transactions/{recurringTransactionId}`
   - `DELETE /users/{userId}/recurring-transactions/{recurringTransactionId}`
 
+## Frontend Status
+
+- Angular frontend is scaffolded in the `frontend` folder
+- App routing exists for:
+  - `/overview`
+  - `/users`
+  - `/users/:userId`
+- Users page shell exists with top navigation and route-based page rendering
+- Frontend components created so far:
+  - `UsersEmptyState`
+  - `CreateUserModal`
+  - `UserCard`
+  - `AddUserSlot`
+- Local create-user flow works in the frontend:
+  - open modal
+  - capture form fields
+  - submit data to parent page state
+  - render 0-user, 1-user, and 2-user UI states
+- Current frontend user state is temporary and local only; it is not connected to the backend yet
+
 ## Testing Status
 
 - Domain tests exist for user creation, balances, projections, one-off transaction behaviour, recurring transaction behaviour, salary overlap rules, replacement behaviour, and short-month cycle logic
@@ -78,6 +98,8 @@
 - One-off transactions are not yet restricted so they can only be added for today or future dates
 - One-off transactions are not yet restricted so they can only be edited or deleted for today or future dates
 - Weekend shifting logic is not implemented yet
+- Frontend Users page is not connected to backend data or backend mutations yet
+- Backend endpoints required for the Users page UI, such as `GET /users` and user-focused transaction data loading, do not exist yet
 
 ## Notes
 
