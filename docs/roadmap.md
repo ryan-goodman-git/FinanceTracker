@@ -2,12 +2,19 @@
 
 ## Current Priority
 
-- Stabilise the backend before shifting focus to frontend work
+- Stabilise the backend in the areas needed to support the new frontend work
+- Add the backend endpoints and response shapes needed for the Users page
+- Replace the temporary frontend-only Users page state with real backend-driven data and mutations
 - Improve exception handling and HTTP response mapping so API behaviour is correct and consistent
 - Add integration test coverage for the API and Infrastructure layers
 
 ## Next Work
 
+- Add a `GET /users` endpoint for loading the Users page
+- Add user-focused transaction loading endpoints or response shapes so the Users page can display recurring bills, with salary returned as a recurring transaction
+- Connect the Angular create-user flow to the existing `POST /users` endpoint
+- Replace the temporary local frontend `users` array with API-driven loading and rendering
+- Add startup frontend logic to route to `Users` when there are 0 users and `Overview` when there are 1 or 2 users
 - Implement clearer exception classification so missing resources and invalid requests are handled differently
 - Update API endpoints to return more accurate HTTP status codes for not-found, invalid input, and business-rule failures
 - Add API integration tests for endpoint behaviour, response codes, and error responses
@@ -16,8 +23,9 @@
 
 ## API Expansion
 
-- Add a `GET /users` endpoint if the frontend needs to display multiple users
-- Add user-focused transaction listing endpoints if the frontend needs to display transaction history or dashboard views
+- Add a `GET /users` endpoint for the Users page
+- Add user-focused transaction loading for recurring bills and one-off transactions where the frontend needs them
+- Keep salary in the frontend response model as a recurring transaction rather than a separate special-case payload
 - Revisit combined-user queries later once the frontend data needs are clearer
 
 ## Domain and Policy Follow-Ups
@@ -30,6 +38,5 @@
 
 ## Do Not Do Yet
 
-- Do not move on to frontend work until the current backend stabilisation work is complete
 - Do not add combined-user queries until the frontend data needs are clearer
 - Do not expand the API surface beyond current priorities until exception handling and integration testing are in place

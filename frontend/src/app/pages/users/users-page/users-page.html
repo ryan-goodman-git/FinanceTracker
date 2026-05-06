@@ -1,0 +1,51 @@
+<div class="users-page">
+  <header class="users-page__header">
+    <div class="users-page__brand">Finance tracker</div>
+
+    <nav class="users-page__nav">
+      <a href="/overview">Overview</a>
+      <a href="/users" class="is-active">Users</a>
+    </nav>
+  </header>
+
+  <main class="users-page__content">
+    @if (users.length === 0) {
+      <app-users-empty-state
+        (addUserClicked)="isCreateUserModalOpen = true"
+      ></app-users-empty-state>
+    }
+
+    @if (users.length === 1) {
+      <section class="users-page__intro">
+        <h1>Users & Recurring Bills</h1>
+        <p>Manage household members and their shared financial commitments.</p>
+      </section>
+
+      <section class="users-page__grid users-page__grid--two-columns">
+        <app-user-card [user]="users[0]"></app-user-card>
+
+        <app-add-user-slot (addClicked)="isCreateUserModalOpen = true"></app-add-user-slot>
+      </section>
+    }
+
+    @if (users.length === 2) {
+      <section class="users-page__intro">
+        <h1>Users & Recurring Bills</h1>
+        <p>Manage household members and their shared financial commitments.</p>
+      </section>
+
+      <section class="users-page__grid users-page__grid--two-columns">
+        @for (user of users; track user.fullName) {
+          <app-user-card [user]="user"></app-user-card>
+        }
+      </section>
+    }
+  </main>
+
+  @if (isCreateUserModalOpen) {
+    <app-create-user-modal
+      (closed)="isCreateUserModalOpen = false"
+      (submitted)="handleCreateUserSubmitted($event)"
+    ></app-create-user-modal>
+  }
+</div>

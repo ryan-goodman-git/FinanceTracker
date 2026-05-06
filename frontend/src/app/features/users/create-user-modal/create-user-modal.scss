@@ -1,0 +1,69 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(17 24 39 / 18%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.modal-card {
+  width: min(100%, 42rem);
+  background: #eefcf2;
+  border-radius: 1.25rem;
+  padding: 2.5rem;
+  box-shadow: 0 20px 50px rgb(15 23 42 / 12%);
+}
+
+h2 {
+  margin: 0 0 2rem;
+  text-align: center;
+  font-size: 2rem;
+}
+
+form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.875rem;
+  padding: 0.95rem 1rem;
+  font: inherit;
+  background: #fff;
+}
+
+.actions {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.actions button {
+  border: 0;
+  border-radius: 0.875rem;
+  padding: 1rem 1.25rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actions button:first-child {
+  background: #fff;
+  color: #16a34a;
+}
+
+.actions button:last-child {
+  background: #16c25b;
+  color: #fff;
+}

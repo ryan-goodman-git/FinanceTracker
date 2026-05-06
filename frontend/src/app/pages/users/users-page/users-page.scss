@@ -1,0 +1,74 @@
+.users-page {
+  min-height: 100vh;
+  background: #fcfcf7;
+  color: #111827;
+}
+
+.users-page__header {
+  height: 5.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.users-page__brand {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.users-page__nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.users-page__nav a {
+  color: #4b5563;
+  text-decoration: none;
+  font-weight: 500;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid transparent;
+}
+
+.users-page__nav a.is-active {
+  color: #16a34a;
+  border-bottom-color: #16a34a;
+}
+
+.users-page__content {
+  min-height: calc(100vh - 5.5rem);
+  padding: 2rem;
+}
+
+.users-page__intro {
+  margin-bottom: 2rem;
+}
+
+.users-page__intro h1 {
+  margin: 0 0 0.75rem;
+  font-size: 3rem;
+  line-height: 1.05;
+}
+
+.users-page__intro p {
+  margin: 0;
+  color: #4f9a62;
+  font-size: 1.125rem;
+}
+
+.users-page__grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.users-page__grid--two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.users-page__grid--two-columns {
+  align-items: stretch;
+}
+
+

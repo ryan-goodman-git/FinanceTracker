@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.user-card {
+  background: #eefcf2;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  height: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.user-card__name {
+  margin: 0 0 1rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.user-card__meta {
+  display: grid;
+  gap: 0.5rem;
+  color: #374151;
+}
