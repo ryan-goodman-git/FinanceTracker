@@ -7,6 +7,11 @@ public class FakeUserRepository : IUserRepository
 {
     private readonly Dictionary<Guid, User> _users = new();
 
+    public IReadOnlyCollection<User> GetAll()
+    {
+        return _users.Values.ToList();
+    }
+
     public User? GetById(Guid id)
     {
         _users.TryGetValue(id, out var user);

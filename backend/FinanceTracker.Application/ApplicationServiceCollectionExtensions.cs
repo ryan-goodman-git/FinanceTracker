@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using GetBalanceForUserOnDate = FinanceTracker.Application.Queries.GetBalanceForUserOnDate;
 using GetProjectedSavingsForUser = FinanceTracker.Application.Queries.GetProjectedSavingsForUser;
+using GetUsers = FinanceTracker.Application.Queries.GetUsers;
 using GetUserById = FinanceTracker.Application.Queries.GetUserById;
 using GetOneOffTransaction = FinanceTracker.Application.Queries.GetOneOffTransactionById;
 using GetRecurringTransaction = FinanceTracker.Application.Queries.GetRecurringTransactionById;
@@ -22,6 +23,7 @@ public static class ApplicationServiceCollectionExtensions
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddScoped<GetUsers.Handler>();
         services.AddScoped<GetUserById.Handler>();
         services.AddScoped<GetBalanceForUserOnDate.Handler>();
         services.AddScoped<GetProjectedSavingsForUser.Handler>();

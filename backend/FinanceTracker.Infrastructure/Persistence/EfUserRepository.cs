@@ -13,6 +13,13 @@ public class EfUserRepository : IUserRepository
         _dbContext = dbContext;
     }
 
+    public IReadOnlyCollection<User> GetAll()
+    {
+        return _dbContext.Users
+            .AsNoTracking()
+            .ToList();
+    }
+
     public User? GetById(Guid userId)
     {
         return _dbContext.Users

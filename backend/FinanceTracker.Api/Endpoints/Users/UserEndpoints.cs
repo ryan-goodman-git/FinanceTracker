@@ -2,6 +2,7 @@ using FinanceTracker.Api.Contracts.Requests.Users;
 using FinanceTracker.Api.Contracts.Responses.Users;
 using FinanceTracker.Api.Errors;
 using CreateUser = FinanceTracker.Application.Commands.CreateUser;
+using GetUsers = FinanceTracker.Application.Queries.GetUsers;
 using GetUserById = FinanceTracker.Application.Queries.GetUserById;
 using GetBalanceForUserOnDate = FinanceTracker.Application.Queries.GetBalanceForUserOnDate;
 using GetProjectedSavingsForUser = FinanceTracker.Application.Queries.GetProjectedSavingsForUser;
@@ -37,6 +38,22 @@ public static class UserEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
+        });
+
+        app.MapGet("/users", (GetUsers.Handler handler) =>
+        {
+            var query = new GetUsers.Query();
+            var results = handler.Handle(query);
+
+            var response = results
+                .Select(user => new GetUserResponse(
+                    user.UserId,
+                    user.Name,
+                    user.InitialBalance,
+                    user.StartDate))
+                .ToList();
+
+            return Results.Ok(response);
         });
         
         app.MapGet("/users/{userId:guid}", (
