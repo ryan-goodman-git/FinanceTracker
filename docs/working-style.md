@@ -5,6 +5,9 @@
 ## Collaboration Preferences
 
 - Work step by step in small increments
+- Do not automatically change code unless explicitly asked to edit files
+- Help step through the problem and explain the next change before implementation
+- If code is requested, print the code in the response first instead of applying it directly
 - Do not give large bulk solutions unless explicitly asked
 - Explain the reasoning before or alongside code
 - Pause after each meaningful step when working interactively

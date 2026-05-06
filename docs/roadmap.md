@@ -3,14 +3,13 @@
 ## Current Priority
 
 - Stabilise the backend in the areas needed to support the new frontend work
-- Add the backend endpoints and response shapes needed for the Users page
+- Add the remaining backend endpoints and response shapes needed for the Users page
 - Replace the temporary frontend-only Users page state with real backend-driven data and mutations
 - Improve exception handling and HTTP response mapping so API behaviour is correct and consistent
 - Add integration test coverage for the API and Infrastructure layers
 
 ## Next Work
 
-- Add a `GET /users` endpoint for loading the Users page
 - Add user-focused transaction loading endpoints or response shapes so the Users page can display recurring bills, with salary returned as a recurring transaction
 - Connect the Angular create-user flow to the existing `POST /users` endpoint
 - Replace the temporary local frontend `users` array with API-driven loading and rendering
@@ -23,7 +22,6 @@
 
 ## API Expansion
 
-- Add a `GET /users` endpoint for the Users page
 - Add user-focused transaction loading for recurring bills and one-off transactions where the frontend needs them
 - Keep salary in the frontend response model as a recurring transaction rather than a separate special-case payload
 - Revisit combined-user queries later once the frontend data needs are clearer

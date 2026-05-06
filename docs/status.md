@@ -22,6 +22,7 @@
 
 - `IUserRepository` exists in the Application layer
 - Query handlers implemented:
+  - `GetUsers`
   - `GetUserById`
   - `GetBalanceForUserOnDate`
   - `GetProjectedSavingsForUser`
@@ -49,6 +50,7 @@
 - Minimal API setup exists in `FinanceTracker.Api`
 - Swagger is enabled in development
 - Endpoints implemented:
+  - `GET /users`
   - `POST /users`
   - `GET /users/{userId}`
   - `GET /users/{userId}/balance`
@@ -99,7 +101,7 @@
 - One-off transactions are not yet restricted so they can only be edited or deleted for today or future dates
 - Weekend shifting logic is not implemented yet
 - Frontend Users page is not connected to backend data or backend mutations yet
-- Backend endpoints required for the Users page UI, such as `GET /users` and user-focused transaction data loading, do not exist yet
+- Backend endpoints required for full Users page UI transaction loading do not exist yet
 
 ## Notes
 
