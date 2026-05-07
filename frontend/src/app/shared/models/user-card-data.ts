@@ -1,6 +1,6 @@
 export interface UserCardData {
+  userId: string;
   fullName: string;
   startingBalance: number;
-  monthlySalary: number;
-  salaryDay: number;
+  startDate: string;
 }

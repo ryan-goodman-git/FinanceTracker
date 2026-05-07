@@ -77,12 +77,15 @@
   - `CreateUserModal`
   - `UserCard`
   - `AddUserSlot`
-- Local create-user flow works in the frontend:
-  - open modal
-  - capture form fields
-  - submit data to parent page state
-  - render 0-user, 1-user, and 2-user UI states
-- Current frontend user state is temporary and local only; it is not connected to the backend yet
+- Users page now loads user summary data from the backend `GET /users` endpoint
+- Users page state uses an Angular signal so the page updates when API data loads
+- User cards currently show backend user summary data:
+  - name
+  - initial balance
+  - start date
+- Create-user modal still opens and captures form data
+- Create-user submit is not connected to the backend `POST /users` endpoint yet
+- Recurring transactions and salary are not loaded into the Users page yet
 
 ## Testing Status
 
@@ -100,7 +103,7 @@
 - One-off transactions are not yet restricted so they can only be added for today or future dates
 - One-off transactions are not yet restricted so they can only be edited or deleted for today or future dates
 - Weekend shifting logic is not implemented yet
-- Frontend Users page is not connected to backend data or backend mutations yet
+- Frontend create-user flow is not connected to backend mutation yet
 - Backend endpoints required for full Users page UI transaction loading do not exist yet
 
 ## Notes
