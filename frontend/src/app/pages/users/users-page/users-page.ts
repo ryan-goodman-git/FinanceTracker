@@ -5,7 +5,7 @@ import { UserCardData } from '../../../shared/models/user-card-data';
 import { UserCard } from '../../../shared/components/user-card/user-card';
 import { AddUserSlot } from '../../../shared/components/add-user-slot/add-user-slot';
 import { UsersEmptyState } from '../../../shared/components/users-empty-state/users-empty-state';
-import { UsersApiService } from '../../../core/services/users-api.service';
+import { UsersPageDataService } from '../../../features/users/services/users-page-data.service';
 
 @Component({
   selector: 'app-users-page',
@@ -14,23 +14,16 @@ import { UsersApiService } from '../../../core/services/users-api.service';
   styleUrl: './users-page.scss',
 })
 export class UsersPage {
-  private readonly usersApiService = inject(UsersApiService);
+  private readonly usersPageDataService = inject(UsersPageDataService);
 
   isCreateUserModalOpen = false;
   users = signal<UserCardData[]>([]);
 
   ngOnInit() {
-    this.usersApiService.getUsers().subscribe((users) => {
-      const mappedUsers = users.map((user) => ({
-        userId: user.userId,
-        fullName: user.name,
-        startingBalance: user.initialBalance,
-        startDate: user.startDate,
-      }));
-
-      this.users.set(mappedUsers);
-    });
-  }
+  this.usersPageDataService.getUsersPageData().subscribe((users) => {
+    this.users.set(users);
+  });
+}
 
   handleCreateUserSubmitted(data: CreateUserData) {
     this.isCreateUserModalOpen = false;

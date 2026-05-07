@@ -2,7 +2,32 @@
   <h2 class="user-card__name">{{ user().fullName }}</h2>
 
   <div class="user-card__meta">
-    <div>Starting balance: {{ user().startingBalance }}</div>
-    <div>Start date: {{ user().startDate }}</div>
+    @if (user().salary) {
+      <section>
+        <h3 class="user-card__section-title">Salary</h3>
+
+        <div class="user-card__row">
+          <span>{{ user().salary?.scheduledDayOfMonth }}</span>
+          <strong>{{ user().salary?.amount | currency: 'GBP' : 'symbol' : '1.2-2' }}</strong>
+        </div>
+      </section>
+    }
+
+    <section>
+      <h3 class="user-card__section-title">Recurring bills</h3>
+
+      @if (user().recurringBills.length === 0) {
+        <div>No recurring bills yet</div>
+      }
+
+      <div class="user-card__rows">
+        @for (bill of user().recurringBills; track bill.recurringTransactionId) {
+          <div class="user-card__row">
+            <span>{{ bill.description }}</span>
+            <strong>{{ bill.amount | currency: 'GBP' : 'symbol' : '1.2-2' }}</strong>
+          </div>
+        }
+      </div>
+    </section>
   </div>
 </div>
