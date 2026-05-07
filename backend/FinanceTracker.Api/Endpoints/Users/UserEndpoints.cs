@@ -38,7 +38,7 @@ public static class UserEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("Users");
 
         app.MapGet("/users", (GetUsers.Handler handler) =>
         {
@@ -54,7 +54,7 @@ public static class UserEndpoints
                 .ToList();
 
             return Results.Ok(response);
-        });
+        }).WithTags("Users");
         
         app.MapGet("/users/{userId:guid}", (
             Guid userId,
@@ -77,7 +77,7 @@ public static class UserEndpoints
             {
                 return Results.NotFound(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("Users");
 
         app.MapGet("/users/{userId:guid}/balance", (
             Guid userId,
@@ -104,7 +104,7 @@ public static class UserEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("Users");
         
         app.MapGet("/users/{userId:guid}/projected-savings", (
             Guid userId,
@@ -132,7 +132,7 @@ public static class UserEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("Users");
         
         return app;
     }

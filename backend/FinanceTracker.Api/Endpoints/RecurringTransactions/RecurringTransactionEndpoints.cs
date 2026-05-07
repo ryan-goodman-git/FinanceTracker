@@ -6,6 +6,7 @@ using AddRecurringTransaction = FinanceTracker.Application.Commands.AddRecurring
 using ReplaceRecurringTransaction = FinanceTracker.Application.Commands.ReplaceRecurringTransaction;
 using EndRecurringTransaction = FinanceTracker.Application.Commands.EndRecurringTransaction;
 using GetRecurringTransactionById = FinanceTracker.Application.Queries.GetRecurringTransactionById;
+using GetRecurringTransactionsForUser = FinanceTracker.Application.Queries.GetRecurringTransactionsForUser;
 
 namespace FinanceTracker.Api.Endpoints.RecurringTransactions;
 
@@ -43,7 +44,7 @@ public static class RecurringTransactionEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("Recurring Transactions");
         
         app.MapGet("/users/{userId:guid}/recurring-transactions/{recurringTransactionId:guid}", (
             Guid userId,
@@ -72,7 +73,38 @@ public static class RecurringTransactionEndpoints
             {
                 return Results.NotFound(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("Recurring Transactions");
+        
+        app.MapGet("/users/{userId:guid}/recurring-transactions", (
+            Guid userId,
+            GetRecurringTransactionsForUser.Handler handler) =>
+        {
+            try
+            {
+                var query = new GetRecurringTransactionsForUser.Query(userId);
+                var results = handler.Handle(query);
+
+                var response = results
+                    .Select(transaction => new GetRecurringTransactionsForUserResponse(
+                        transaction.RecurringTransactionId,
+                        transaction.UserId,
+                        transaction.Description,
+                        transaction.Amount,
+                        transaction.Type,
+                        transaction.Kind,
+                        transaction.StartDate,
+                        transaction.EndDate,
+                        transaction.ScheduledDayOfMonth))
+                    .ToList();
+
+                return Results.Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.NotFound(new ApiError(ex.Message));
+            }
+        }).WithTags("Recurring Transactions");
+
 
         app.MapPut("/users/{userId:guid}/recurring-transactions/{recurringTransactionId:guid}", (
             Guid userId,
@@ -104,7 +136,7 @@ public static class RecurringTransactionEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("Recurring Transactions");
 
         app.MapDelete("/users/{userId:guid}/recurring-transactions/{recurringTransactionId:guid}", (
             Guid userId,
@@ -132,7 +164,7 @@ public static class RecurringTransactionEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("Recurring Transactions");
         
         return app;
     }
