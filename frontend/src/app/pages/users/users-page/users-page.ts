@@ -20,12 +20,15 @@ export class UsersPage {
   users = signal<UserCardData[]>([]);
 
   ngOnInit() {
-  this.usersPageDataService.getUsersPageData().subscribe((users) => {
-    this.users.set(users);
-  });
-}
+    this.usersPageDataService.getUsersPageData().subscribe((users) => {
+      this.users.set(users);
+    });
+  }
 
   handleCreateUserSubmitted(data: CreateUserData) {
-    this.isCreateUserModalOpen = false;
+    this.usersPageDataService.createUserAndReloadUsersPageData(data).subscribe((users) => {
+      this.users.set(users);
+      this.isCreateUserModalOpen = false;
+    });
   }
 }

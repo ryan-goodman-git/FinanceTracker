@@ -72,6 +72,7 @@
   - `/users`
   - `/users/:userId`
 - Users page shell exists with top navigation and route-based page rendering
+- Root route currently redirects to `/users`
 - Frontend components created so far:
   - `UsersEmptyState`
   - `CreateUserModal`
@@ -81,12 +82,13 @@
 - Users page loads each user's recurring transactions from `GET /users/{userId}/recurring-transactions`
 - Users page state uses an Angular signal so the page updates when API data loads
 - Users page uses a feature-level data service to combine user summaries with recurring transaction data
+- Create-user submit posts to the backend `POST /users` endpoint, then reloads Users page data
 - User cards currently show:
   - name
   - salary amount and scheduled day
   - recurring bill descriptions and amounts
-- Create-user modal still opens and captures form data
-- Create-user submit is not connected to the backend `POST /users` endpoint yet
+- Overview page component exists but has no backend-driven data yet
+- User details route and page component exist but are not built out yet
 
 
 ## Testing Status
@@ -101,14 +103,13 @@
 - The maximum limit of two users in the system is not enforced yet
 - `GetCombinedBalanceOnDate` is not implemented
 - `GetCombinedProjectedSavings` is not implemented
-- One-off transaction editing is currently limited to description and amount only
 - One-off transactions are not yet restricted so they can only be added for today or future dates
 - One-off transactions are not yet restricted so they can only be edited or deleted for today or future dates
 - Weekend shifting logic is not implemented yet
-- Frontend create-user flow is not connected to backend mutation yet
+- Frontend create-user failures leave the modal open but do not show an error message yet
 - Overview page is not connected to backend data yet
 - Backend read model for Overview page data does not exist yet
-
+- `EfUserRepository.Update` still writes change-tracker state to the console
 
 ## Notes
 

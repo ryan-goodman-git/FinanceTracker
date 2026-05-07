@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 
 import { UsersApiService } from '../../../core/services/users-api.service';
+import { CreateUserData } from '../../../shared/models/create-user-data';
+import { CreateUserRequest } from '../../../shared/models/create-user-request';
 import { RecurringTransactionResponse } from '../../../shared/models/recurring-transaction-response';
 import { UserCardData } from '../../../shared/models/user-card-data';
 import { UserSummaryResponse } from '../../../shared/models/user-summary-response';
@@ -37,6 +39,30 @@ export class UsersPageDataService {
         );
       }),
     );
+  }
+
+  createUserAndReloadUsersPageData(data: CreateUserData): Observable<UserCardData[]> {
+    return this.usersApiService.createUser(this.toCreateUserRequest(data)).pipe(
+      switchMap(() => this.getUsersPageData()),
+    );
+  }
+
+  private toCreateUserRequest(data: CreateUserData): CreateUserRequest {
+    return {
+      name: data.fullName,
+      initialBalance: data.startingBalance,
+      startDate: this.toLocalDateString(new Date()),
+      salaryAmount: data.monthlySalary,
+      salaryDayOfMonth: data.salaryDay,
+    };
+  }
+
+  private toLocalDateString(date: Date): string {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   private toUserCardData(

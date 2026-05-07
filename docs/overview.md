@@ -20,7 +20,7 @@
 - Track a user's financial position over time
 - Return balance on any requested date
 - Calculate projected savings for the current salary cycle
-- Support a very small user count (Min 2 - Max 1)
+- Support a very small user count (Min 1 - Max 2)
 
 ## Current Scope
 
