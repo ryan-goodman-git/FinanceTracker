@@ -43,7 +43,7 @@ public static class OneOffTransactionEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("One-Off Transactions");
         
         app.MapGet("/users/{userId:guid}/one-off-transactions/{transactionId:guid}", (
             Guid userId,
@@ -69,7 +69,7 @@ public static class OneOffTransactionEndpoints
             {
                 return Results.NotFound(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("One-Off Transactions");
 
         app.MapPut("/users/{userId:guid}/one-off-transactions/{transactionId:guid}", (
             Guid userId,
@@ -97,7 +97,7 @@ public static class OneOffTransactionEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("One-Off Transactions");
 
         app.MapDelete("/users/{userId:guid}/one-off-transactions/{transactionId:guid}", (
             Guid userId,
@@ -122,7 +122,7 @@ public static class OneOffTransactionEndpoints
             {
                 return Results.BadRequest(new ApiError(ex.Message));
             }
-        });
+        }).WithTags("One-Off Transactions");
         
         return app;
     }
