@@ -4,7 +4,6 @@
 
 - Stabilise the backend in the areas needed to support the new frontend work
 - Add the remaining backend endpoints and response shapes needed for the Users page
-- Replace the temporary frontend-only Users page state with real backend-driven data and mutations
 - Improve exception handling and HTTP response mapping so API behaviour is correct and consistent
 - Add integration test coverage for the API and Infrastructure layers
 
