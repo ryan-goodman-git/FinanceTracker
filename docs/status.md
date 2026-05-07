@@ -78,14 +78,16 @@
   - `UserCard`
   - `AddUserSlot`
 - Users page now loads user summary data from the backend `GET /users` endpoint
+- Users page loads each user's recurring transactions from `GET /users/{userId}/recurring-transactions`
 - Users page state uses an Angular signal so the page updates when API data loads
-- User cards currently show backend user summary data:
+- Users page uses a feature-level data service to combine user summaries with recurring transaction data
+- User cards currently show:
   - name
-  - initial balance
-  - start date
+  - salary amount and scheduled day
+  - recurring bill descriptions and amounts
 - Create-user modal still opens and captures form data
 - Create-user submit is not connected to the backend `POST /users` endpoint yet
-- Recurring transactions and salary are not loaded into the Users page yet
+
 
 ## Testing Status
 
@@ -104,7 +106,9 @@
 - One-off transactions are not yet restricted so they can only be edited or deleted for today or future dates
 - Weekend shifting logic is not implemented yet
 - Frontend create-user flow is not connected to backend mutation yet
-- Backend endpoints required for full Users page UI transaction loading do not exist yet
+- Overview page is not connected to backend data yet
+- Backend read model for Overview page data does not exist yet
+
 
 ## Notes
 

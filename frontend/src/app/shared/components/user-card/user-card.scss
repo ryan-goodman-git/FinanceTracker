@@ -3,7 +3,7 @@
 }
 
 .user-card {
-  background: #eefcf2;
+  background: #dfeee6;
   border-radius: 1.5rem;
   padding: 2rem;
   height: 32rem;
@@ -22,4 +22,31 @@
   display: grid;
   gap: 0.5rem;
   color: #374151;
+}
+
+.user-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #fff;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.user-card__row strong {
+  font-weight: 700;
+}
+
+.user-card__rows {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.user-card__section-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }

@@ -9,10 +9,10 @@
 
 ## Next Work
 
-- Add user-focused transaction loading endpoints or response shapes so the Users page can display recurring bills, with salary returned as a recurring transaction
 - Connect the Angular create-user flow to the existing `POST /users` endpoint
 - Replace the temporary local frontend `users` array with API-driven loading and rendering
 - Add startup frontend logic to route to `Users` when there are 0 users and `Overview` when there are 1 or 2 users
+- Design backend read model and endpoint for Overview page data
 - Implement clearer exception classification so missing resources and invalid requests are handled differently
 - Update API endpoints to return more accurate HTTP status codes for not-found, invalid input, and business-rule failures
 - Add API integration tests for endpoint behaviour, response codes, and error responses
@@ -21,8 +21,8 @@
 
 ## API Expansion
 
-- Add user-focused transaction loading for recurring bills and one-off transactions where the frontend needs them
-- Keep salary in the frontend response model as a recurring transaction rather than a separate special-case payload
+- Add Overview-focused read endpoint when the Overview page data shape is clearer
+- Keep salary represented as a recurring transaction in backend responses
 - Revisit combined-user queries later once the frontend data needs are clearer
 
 ## Domain and Policy Follow-Ups
